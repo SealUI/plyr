@@ -14,7 +14,7 @@ const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
 const run = require('run-sequence');
 const prefix = require('gulp-autoprefixer');
-const gitbranch = require('git-branch');
+//const gitbranch = require('git-branch');
 const svgstore = require('gulp-svgstore');
 const svgmin = require('gulp-svgmin');
 const rename = require('gulp-rename');
@@ -54,7 +54,7 @@ const paths = {
         },
 
         // Output paths
-        output: path.join(root, 'dist/'),
+        output: path.join(root, 'dist/')
     },
     demo: {
         // Source paths
@@ -67,14 +67,14 @@ const paths = {
         output: path.join(root, 'demo/dist/'),
 
         // Demo
-        root: path.join(root, 'demo/'),
+        root: path.join(root, 'demo/')
     },
     upload: [
         path.join(root, `dist/*${minSuffix}.*`),
         path.join(root, 'dist/*.css'),
         path.join(root, 'dist/*.svg'),
         path.join(root, `demo/dist/*${minSuffix}.*`),
-        path.join(root, 'demo/dist/*.css'),
+        path.join(root, 'demo/dist/*.css')
     ],
 };
 
@@ -83,7 +83,7 @@ const tasks = {
     sass: [],
     js: [],
     sprite: [],
-    clean: ['clean'],
+    clean: ['clean']
 };
 
 // Size plugin
@@ -98,10 +98,10 @@ const babelrc = {
         'env',
         {
             targets: {
-                browsers,
+                browsers
             },
             useBuiltIns: true,
-            modules: false,
+            modules: false
         },
     ]],
     plugins: ['external-helpers'],
@@ -113,7 +113,7 @@ const babelrc = {
 gulp.task('clean', () => {
     const dirs = [
         paths.plyr.output,
-        paths.demo.output,
+        paths.demo.output
     ].map(dir => path.join(dir, '**/*'));
 
     // Don't delete the mp4
@@ -143,8 +143,8 @@ const build = {
                                     babel(babelrc),
                                 ],
                             },
-                            options,
-                        ),
+                            options
+                        )
                     )
                     .pipe(sourcemaps.write(''))
                     .pipe(gulp.dest(output))
@@ -153,7 +153,7 @@ const build = {
                     .pipe(size(sizeOptions))
                     .pipe(rename({ suffix: minSuffix }))
                     .pipe(sourcemaps.write(''))
-                    .pipe(gulp.dest(output)),
+                    .pipe(gulp.dest(output))
             );
         });
     },
@@ -171,7 +171,7 @@ const build = {
                     .pipe(prefix(browsers, { cascade: false }))
                     .pipe(cleancss())
                     .pipe(size(sizeOptions))
-                    .pipe(gulp.dest(paths[bundle].output)),
+                    .pipe(gulp.dest(paths[bundle].output))
             );
         });
     },
@@ -187,13 +187,13 @@ const build = {
                     svgmin({
                         plugins: [{
                             removeDesc: true,
-                        }],
-                    }),
+                        }]
+                    })
                 )
                 .pipe(svgstore())
                 .pipe(rename({ basename: bundle }))
                 .pipe(size(sizeOptions))
-                .pipe(gulp.dest(paths[bundle].output)),
+                .pipe(gulp.dest(paths[bundle].output))
         );
     },
 };
@@ -239,11 +239,11 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
     const branch = {
         current: gitbranch.sync(),
         master: 'master',
-        beta: 'beta',
+        beta: 'beta'
     };
     const allowed = [
         branch.master,
-        branch.beta,
+        branch.beta
     ];
 
     const maxAge = 31536000; // 1 year
@@ -251,14 +251,14 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         cdn: {
             headers: {
                 'Cache-Control': `max-age=${maxAge}`,
-                Vary: 'Accept-Encoding',
+                Vary: 'Accept-Encoding'
             },
         },
         demo: {
             uploadPath: branch.current === branch.beta ? 'beta/' : null,
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-                Vary: 'Accept-Encoding',
+                Vary: 'Accept-Encoding'
             },
         },
         symlinks(ver, filename) {
@@ -266,8 +266,8 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
                 headers: {
                     // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
                     'x-amz-website-redirect-location': `/${ver}/${filename}`,
-                    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-                },
+                    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0'
+                }
             };
         },
     };
@@ -311,7 +311,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
                     rename(p => {
                         p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
                         p.dirname = p.dirname.replace('.', version); // eslint-disable-line
-                    }),
+                    })
                 )
                 // Remove min suffix from source map URL
                 .pipe(replace(/sourceMappingURL=([\w-?.]+)/, (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`))
@@ -319,7 +319,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
                     size({
                         showFiles: true,
                         gzip: true,
-                    }),
+                    })
                 )
                 .pipe(replace(localPath, versionPath))
                 .pipe(s3(aws.cdn, options.cdn))
@@ -400,9 +400,9 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         // Weird, I know...
         return gulp.src([`${paths.demo.root}index.html`]).pipe(
             open('', {
-                url: `http://${aws.demo.domain}`,
-            }),
-        );
+                url: `http://${aws.demo.domain}`
+            })
+        )
     });
 
     // Do everything

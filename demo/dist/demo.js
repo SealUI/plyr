@@ -3,10 +3,6 @@
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-
-
-
-
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -87,30 +83,20 @@ function serializer(replacer, cycleReplacer) {
   };
 }
 });
-
 var stringify_2 = stringify_1.getSerialize;
 
-
-var stringify = Object.freeze({
-	default: stringify_1,
-	__moduleExports: stringify_1,
-	getSerialize: stringify_2
-});
-
-var stringify$1 = ( stringify && stringify_1 ) || stringify;
-
-var _window$3 =
+var _window =
   typeof window !== 'undefined'
     ? window
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
 
-function isObject$1(what) {
+function isObject(what) {
   return typeof what === 'object' && what !== null;
 }
 
 // Yanked from https://git.io/vS8DV re-used under CC0
 // with some tiny modifications
-function isError$1(value) {
+function isError(value) {
   switch ({}.toString.call(value)) {
     case '[object Error]':
       return true;
@@ -123,32 +109,32 @@ function isError$1(value) {
   }
 }
 
-function isErrorEvent$1(value) {
+function isErrorEvent(value) {
   return supportsErrorEvent() && {}.toString.call(value) === '[object ErrorEvent]';
 }
 
-function isUndefined$1(what) {
+function isUndefined(what) {
   return what === void 0;
 }
 
-function isFunction$1(what) {
+function isFunction(what) {
   return typeof what === 'function';
 }
 
-function isPlainObject$1(what) {
+function isPlainObject(what) {
   return Object.prototype.toString.call(what) === '[object Object]';
 }
 
-function isString$1(what) {
+function isString(what) {
   return Object.prototype.toString.call(what) === '[object String]';
 }
 
-function isArray$1(what) {
+function isArray(what) {
   return Object.prototype.toString.call(what) === '[object Array]';
 }
 
-function isEmptyObject$1(what) {
-  if (!isPlainObject$1(what)) return false;
+function isEmptyObject(what) {
+  if (!isPlainObject(what)) return false;
 
   for (var _ in what) {
     if (what.hasOwnProperty(_)) {
@@ -167,8 +153,8 @@ function supportsErrorEvent() {
   }
 }
 
-function supportsFetch$1() {
-  if (!('fetch' in _window$3)) return false;
+function supportsFetch() {
+  if (!('fetch' in _window)) return false;
 
   try {
     new Headers(); // eslint-disable-line no-new
@@ -184,8 +170,8 @@ function supportsFetch$1() {
 // https://caniuse.com/#feat=referrer-policy
 // It doesn't. And it throw exception instead of ignoring this parameter...
 // REF: https://github.com/getsentry/raven-js/issues/1233
-function supportsReferrerPolicy$1() {
-  if (!supportsFetch$1()) return false;
+function supportsReferrerPolicy() {
+  if (!supportsFetch()) return false;
 
   try {
     // eslint-disable-next-line no-new
@@ -214,12 +200,12 @@ function wrappedCallback(callback) {
   return dataCallback;
 }
 
-function each$1(obj, callback) {
+function each(obj, callback) {
   var i, j;
 
-  if (isUndefined$1(obj.length)) {
+  if (isUndefined(obj.length)) {
     for (i in obj) {
-      if (hasKey$1(obj, i)) {
+      if (hasKey(obj, i)) {
         callback.call(null, i, obj[i]);
       }
     }
@@ -233,11 +219,11 @@ function each$1(obj, callback) {
   }
 }
 
-function objectMerge$1(obj1, obj2) {
+function objectMerge(obj1, obj2) {
   if (!obj2) {
     return obj1;
   }
-  each$1(obj2, function(key, value) {
+  each(obj2, function(key, value) {
     obj1[key] = value;
   });
   return obj1;
@@ -251,14 +237,14 @@ function objectMerge$1(obj1, obj2) {
  * supported because it's not relevant for other "platforms". See related issue:
  * https://github.com/getsentry/react-native-sentry/issues/57
  */
-function objectFrozen$1(obj) {
+function objectFrozen(obj) {
   if (!Object.isFrozen) {
     return false;
   }
   return Object.isFrozen(obj);
 }
 
-function truncate$1(str, max) {
+function truncate(str, max) {
   return !max || str.length <= max ? str : str.substr(0, max) + '\u2026';
 }
 
@@ -269,11 +255,11 @@ function truncate$1(str, max) {
  * @param {Object} host object to check property
  * @param {string} key to check
  */
-function hasKey$1(object, key) {
+function hasKey(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
 }
 
-function joinRegExp$1(patterns) {
+function joinRegExp(patterns) {
   // Combine an array of regular expressions and strings into one large regexp
   // Be mad.
   var sources = [],
@@ -283,7 +269,7 @@ function joinRegExp$1(patterns) {
 
   for (; i < len; i++) {
     pattern = patterns[i];
-    if (isString$1(pattern)) {
+    if (isString(pattern)) {
       // If it's a string, we need to escape it
       // Taken from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
       sources.push(pattern.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1'));
@@ -296,9 +282,9 @@ function joinRegExp$1(patterns) {
   return new RegExp(sources.join('|'), 'i');
 }
 
-function urlencode$1(o) {
+function urlencode(o) {
   var pairs = [];
-  each$1(o, function(key, value) {
+  each(o, function(key, value) {
     pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
   });
   return pairs.join('&');
@@ -307,7 +293,7 @@ function urlencode$1(o) {
 // borrowed from https://tools.ietf.org/html/rfc3986#appendix-B
 // intentionally using regex and not <a/> href parsing trick because React Native and other
 // environments where DOM might not be available
-function parseUrl$1(url) {
+function parseUrl(url) {
   if (typeof url !== 'string') return {};
   var match = url.match(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/);
 
@@ -321,10 +307,10 @@ function parseUrl$1(url) {
     relative: match[5] + query + fragment // everything minus origin
   };
 }
-function uuid4$1() {
-  var crypto = _window$3.crypto || _window$3.msCrypto;
+function uuid4() {
+  var crypto = _window.crypto || _window.msCrypto;
 
-  if (!isUndefined$1(crypto) && crypto.getRandomValues) {
+  if (!isUndefined(crypto) && crypto.getRandomValues) {
     // Use window.crypto API if available
     // eslint-disable-next-line no-undef
     var arr = new Uint16Array(8);
@@ -370,7 +356,7 @@ function uuid4$1() {
  * @param elem
  * @returns {string}
  */
-function htmlTreeAsString$1(elem) {
+function htmlTreeAsString(elem) {
   /* eslint no-extra-parens:0*/
   var MAX_TRAVERSE_HEIGHT = 5,
     MAX_OUTPUT_LEN = 80,
@@ -427,7 +413,7 @@ function htmlElementAsString(elem) {
   }
 
   className = elem.className;
-  if (className && isString$1(className)) {
+  if (className && isString(className)) {
     classes = className.split(/\s+/);
     for (i = 0; i < classes.length; i++) {
       out.push('.' + classes[i]);
@@ -455,13 +441,13 @@ function isOnlyOneTruthy(a, b) {
  * Returns true if both parameters are undefined
  */
 function isBothUndefined(a, b) {
-  return isUndefined$1(a) && isUndefined$1(b);
+  return isUndefined(a) && isUndefined(b);
 }
 
 /**
  * Returns true if the two input exception interfaces have the same content
  */
-function isSameException$1(ex1, ex2) {
+function isSameException(ex1, ex2) {
   if (isOnlyOneTruthy(ex1, ex2)) return false;
 
   ex1 = ex1.values[0];
@@ -472,13 +458,13 @@ function isSameException$1(ex1, ex2) {
   // in case both stacktraces are undefined, we can't decide so default to false
   if (isBothUndefined(ex1.stacktrace, ex2.stacktrace)) return false;
 
-  return isSameStacktrace$1(ex1.stacktrace, ex2.stacktrace);
+  return isSameStacktrace(ex1.stacktrace, ex2.stacktrace);
 }
 
 /**
  * Returns true if the two input stack trace interfaces have the same content
  */
-function isSameStacktrace$1(stack1, stack2) {
+function isSameStacktrace(stack1, stack2) {
   if (isOnlyOneTruthy(stack1, stack2)) return false;
 
   var frames1 = stack1.frames;
@@ -510,7 +496,8 @@ function isSameStacktrace$1(stack1, stack2) {
  * @param replacement replacement function
  * @param track {optional} record instrumentation to an array
  */
-function fill$1(obj, name, replacement, track) {
+function fill(obj, name, replacement, track) {
+  if (obj == null) return;
   var orig = obj[name];
   obj[name] = replacement(orig);
   obj[name].__raven__ = true;
@@ -527,7 +514,7 @@ function fill$1(obj, name, replacement, track) {
  * @returns {string}
  */
 function safeJoin(input, delimiter) {
-  if (!isArray$1(input)) return '';
+  if (!isArray(input)) return '';
 
   var output = [];
 
@@ -583,7 +570,7 @@ function serializeValue(value) {
 function serializeObject(value, depth) {
   if (depth === 0) return serializeValue(value);
 
-  if (isPlainObject$1(value)) {
+  if (isPlainObject(value)) {
     return Object.keys(value).reduce(function(acc, key) {
       acc[key] = serializeObject(value[key], depth - 1);
       return acc;
@@ -597,22 +584,22 @@ function serializeObject(value, depth) {
   return serializeValue(value);
 }
 
-function serializeException$1(ex, depth, maxSize) {
-  if (!isPlainObject$1(ex)) return ex;
+function serializeException(ex, depth, maxSize) {
+  if (!isPlainObject(ex)) return ex;
 
   depth = typeof depth !== 'number' ? MAX_SERIALIZE_EXCEPTION_DEPTH : depth;
   maxSize = typeof depth !== 'number' ? MAX_SERIALIZE_EXCEPTION_SIZE : maxSize;
 
   var serialized = serializeObject(ex, depth);
 
-  if (jsonSize(stringify$1(serialized)) > maxSize) {
-    return serializeException$1(ex, depth - 1);
+  if (jsonSize(stringify_1(serialized)) > maxSize) {
+    return serializeException(ex, depth - 1);
   }
 
   return serialized;
 }
 
-function serializeKeysForMessage$1(keys, maxLength) {
+function serializeKeysForMessage(keys, maxLength) {
   if (typeof keys === 'number' || typeof keys === 'string') return keys.toString();
   if (!Array.isArray(keys)) return '';
 
@@ -634,110 +621,88 @@ function serializeKeysForMessage$1(keys, maxLength) {
   return '';
 }
 
+function sanitize(input, sanitizeKeys) {
+  if (!isArray(sanitizeKeys) || (isArray(sanitizeKeys) && sanitizeKeys.length === 0))
+    return input;
+
+  var sanitizeRegExp = joinRegExp(sanitizeKeys);
+  var sanitizeMask = '********';
+  var safeInput;
+
+  try {
+    safeInput = JSON.parse(stringify_1(input));
+  } catch (o_O) {
+    return input;
+  }
+
+  function sanitizeWorker(workerInput) {
+    if (isArray(workerInput)) {
+      return workerInput.map(function(val) {
+        return sanitizeWorker(val);
+      });
+    }
+
+    if (isPlainObject(workerInput)) {
+      return Object.keys(workerInput).reduce(function(acc, k) {
+        if (sanitizeRegExp.test(k)) {
+          acc[k] = sanitizeMask;
+        } else {
+          acc[k] = sanitizeWorker(workerInput[k]);
+        }
+        return acc;
+      }, {});
+    }
+
+    return workerInput;
+  }
+
+  return sanitizeWorker(safeInput);
+}
+
 var utils = {
-  isObject: isObject$1,
-  isError: isError$1,
-  isErrorEvent: isErrorEvent$1,
-  isUndefined: isUndefined$1,
-  isFunction: isFunction$1,
-  isPlainObject: isPlainObject$1,
-  isString: isString$1,
-  isArray: isArray$1,
-  isEmptyObject: isEmptyObject$1,
+  isObject: isObject,
+  isError: isError,
+  isErrorEvent: isErrorEvent,
+  isUndefined: isUndefined,
+  isFunction: isFunction,
+  isPlainObject: isPlainObject,
+  isString: isString,
+  isArray: isArray,
+  isEmptyObject: isEmptyObject,
   supportsErrorEvent: supportsErrorEvent,
-  supportsFetch: supportsFetch$1,
-  supportsReferrerPolicy: supportsReferrerPolicy$1,
+  supportsFetch: supportsFetch,
+  supportsReferrerPolicy: supportsReferrerPolicy,
   supportsPromiseRejectionEvent: supportsPromiseRejectionEvent,
   wrappedCallback: wrappedCallback,
-  each: each$1,
-  objectMerge: objectMerge$1,
-  truncate: truncate$1,
-  objectFrozen: objectFrozen$1,
-  hasKey: hasKey$1,
-  joinRegExp: joinRegExp$1,
-  urlencode: urlencode$1,
-  uuid4: uuid4$1,
-  htmlTreeAsString: htmlTreeAsString$1,
+  each: each,
+  objectMerge: objectMerge,
+  truncate: truncate,
+  objectFrozen: objectFrozen,
+  hasKey: hasKey,
+  joinRegExp: joinRegExp,
+  urlencode: urlencode,
+  uuid4: uuid4,
+  htmlTreeAsString: htmlTreeAsString,
   htmlElementAsString: htmlElementAsString,
-  isSameException: isSameException$1,
-  isSameStacktrace: isSameStacktrace$1,
-  parseUrl: parseUrl$1,
-  fill: fill$1,
+  isSameException: isSameException,
+  isSameStacktrace: isSameStacktrace,
+  parseUrl: parseUrl,
+  fill: fill,
   safeJoin: safeJoin,
-  serializeException: serializeException$1,
-  serializeKeysForMessage: serializeKeysForMessage$1
+  serializeException: serializeException,
+  serializeKeysForMessage: serializeKeysForMessage,
+  sanitize: sanitize
 };
 
-var utils_1 = utils.isObject;
-var utils_2 = utils.isError;
-var utils_3 = utils.isErrorEvent;
-var utils_4 = utils.isUndefined;
-var utils_5 = utils.isFunction;
-var utils_6 = utils.isPlainObject;
-var utils_7 = utils.isString;
-var utils_8 = utils.isArray;
-var utils_9 = utils.isEmptyObject;
-var utils_10 = utils.supportsErrorEvent;
-var utils_11 = utils.supportsFetch;
-var utils_12 = utils.supportsReferrerPolicy;
-var utils_13 = utils.supportsPromiseRejectionEvent;
-var utils_14 = utils.wrappedCallback;
-var utils_15 = utils.each;
-var utils_16 = utils.objectMerge;
-var utils_17 = utils.truncate;
-var utils_18 = utils.objectFrozen;
-var utils_19 = utils.hasKey;
-var utils_20 = utils.joinRegExp;
-var utils_21 = utils.urlencode;
-var utils_22 = utils.uuid4;
-var utils_23 = utils.htmlTreeAsString;
-var utils_24 = utils.htmlElementAsString;
-var utils_25 = utils.isSameException;
-var utils_26 = utils.isSameStacktrace;
-var utils_27 = utils.parseUrl;
-var utils_28 = utils.fill;
-var utils_29 = utils.safeJoin;
-var utils_30 = utils.serializeException;
-var utils_31 = utils.serializeKeysForMessage;
+/*
+ TraceKit - Cross brower stack traces
 
+ This was originally forked from github.com/occ/TraceKit, but has since been
+ largely re-written and is now maintained as part of raven-js.  Tests for
+ this are in test/vendor.
 
-var utils$2 = Object.freeze({
-	default: utils,
-	__moduleExports: utils,
-	isObject: utils_1,
-	isError: utils_2,
-	isErrorEvent: utils_3,
-	isUndefined: utils_4,
-	isFunction: utils_5,
-	isPlainObject: utils_6,
-	isString: utils_7,
-	isArray: utils_8,
-	isEmptyObject: utils_9,
-	supportsErrorEvent: utils_10,
-	supportsFetch: utils_11,
-	supportsReferrerPolicy: utils_12,
-	supportsPromiseRejectionEvent: utils_13,
-	wrappedCallback: utils_14,
-	each: utils_15,
-	objectMerge: utils_16,
-	truncate: utils_17,
-	objectFrozen: utils_18,
-	hasKey: utils_19,
-	joinRegExp: utils_20,
-	urlencode: utils_21,
-	uuid4: utils_22,
-	htmlTreeAsString: utils_23,
-	htmlElementAsString: utils_24,
-	isSameException: utils_25,
-	isSameStacktrace: utils_26,
-	parseUrl: utils_27,
-	fill: utils_28,
-	safeJoin: utils_29,
-	serializeException: utils_30,
-	serializeKeysForMessage: utils_31
-});
-
-var utils$3 = ( utils$2 && utils ) || utils$2;
+ MIT license
+*/
 
 var TraceKit = {
   collectWindowErrors: true,
@@ -745,7 +710,7 @@ var TraceKit = {
 };
 
 // This is to be defensive in environments where window does not exist (see https://github.com/getsentry/raven-js/pull/785)
-var _window$2 =
+var _window$1 =
   typeof window !== 'undefined'
     ? window
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
@@ -877,9 +842,9 @@ TraceKit.report = (function reportModuleWrapper() {
   function traceKitWindowOnError(msg, url, lineNo, colNo, ex) {
     var stack = null;
     // If 'ex' is ErrorEvent, get real Error from inside
-    var exception = utils$3.isErrorEvent(ex) ? ex.error : ex;
+    var exception = utils.isErrorEvent(ex) ? ex.error : ex;
     // If 'msg' is ErrorEvent, get real message from inside
-    var message = utils$3.isErrorEvent(msg) ? msg.message : msg;
+    var message = utils.isErrorEvent(msg) ? msg.message : msg;
 
     if (lastExceptionStack) {
       TraceKit.computeStackTrace.augmentStackTraceWithInitialElement(
@@ -889,7 +854,7 @@ TraceKit.report = (function reportModuleWrapper() {
         message
       );
       processLastException();
-    } else if (exception && utils$3.isError(exception)) {
+    } else if (exception && utils.isError(exception)) {
       // non-string `exception` arg; attempt to extract stack trace
 
       // New chrome and blink send along a real error object
@@ -937,8 +902,8 @@ TraceKit.report = (function reportModuleWrapper() {
     if (_onErrorHandlerInstalled) {
       return;
     }
-    _oldOnerrorHandler = _window$2.onerror;
-    _window$2.onerror = traceKitWindowOnError;
+    _oldOnerrorHandler = _window$1.onerror;
+    _window$1.onerror = traceKitWindowOnError;
     _onErrorHandlerInstalled = true;
   }
 
@@ -946,7 +911,7 @@ TraceKit.report = (function reportModuleWrapper() {
     if (!_onErrorHandlerInstalled) {
       return;
     }
-    _window$2.onerror = _oldOnerrorHandler;
+    _window$1.onerror = _oldOnerrorHandler;
     _onErrorHandlerInstalled = false;
     _oldOnerrorHandler = undefined;
   }
@@ -1356,13 +1321,6 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 
 var tracekit = TraceKit;
 
-
-
-var tracekit$2 = Object.freeze({
-	default: tracekit,
-	__moduleExports: tracekit
-});
-
 /*
  * JavaScript MD5
  * https://github.com/blueimp/JavaScript-MD5
@@ -1630,13 +1588,6 @@ function md5(string, key, raw) {
 
 var md5_1 = md5;
 
-
-
-var md5$1 = Object.freeze({
-	default: md5_1,
-	__moduleExports: md5_1
-});
-
 function RavenConfigError(message) {
   this.name = 'RavenConfigError';
   this.message = message;
@@ -1645,13 +1596,6 @@ RavenConfigError.prototype = new Error();
 RavenConfigError.prototype.constructor = RavenConfigError;
 
 var configError = RavenConfigError;
-
-
-
-var configError$2 = Object.freeze({
-	default: configError,
-	__moduleExports: configError
-});
 
 var wrapMethod = function(console, level, callback) {
   var originalConsoleLevel = console[level];
@@ -1666,14 +1610,14 @@ var wrapMethod = function(console, level, callback) {
   console[level] = function() {
     var args = [].slice.call(arguments);
 
-    var msg = utils$3.safeJoin(args, ' ');
+    var msg = utils.safeJoin(args, ' ');
     var data = {level: sentryLevel, logger: 'console', extra: {arguments: args}};
 
     if (level === 'assert') {
       if (args[0] === false) {
         // Default browsers message
         msg =
-          'Assertion failed: ' + (utils$3.safeJoin(args.slice(1), ' ') || 'console.assert');
+          'Assertion failed: ' + (utils.safeJoin(args.slice(1), ' ') || 'console.assert');
         data.extra.arguments = args.slice(1);
         callback && callback(msg, data);
       }
@@ -1694,69 +1638,61 @@ var console$1 = {
   wrapMethod: wrapMethod
 };
 
-var console_1 = console$1.wrapMethod;
+/*global XDomainRequest:false */
 
 
-var console$3 = Object.freeze({
-	default: console$1,
-	__moduleExports: console$1,
-	wrapMethod: console_1
-});
 
-var TraceKit$1 = ( tracekit$2 && tracekit ) || tracekit$2;
 
-var md5$2 = ( md5$1 && md5_1 ) || md5$1;
 
-var RavenConfigError$1 = ( configError$2 && configError ) || configError$2;
 
-var require$$0 = ( console$3 && console$1 ) || console$3;
 
-var isError = utils$3.isError;
-var isObject = utils$3.isObject;
-var isPlainObject = utils$3.isPlainObject;
-var isErrorEvent = utils$3.isErrorEvent;
-var isUndefined = utils$3.isUndefined;
-var isFunction = utils$3.isFunction;
-var isString = utils$3.isString;
-var isArray = utils$3.isArray;
-var isEmptyObject = utils$3.isEmptyObject;
-var each = utils$3.each;
-var objectMerge = utils$3.objectMerge;
-var truncate = utils$3.truncate;
-var objectFrozen = utils$3.objectFrozen;
-var hasKey = utils$3.hasKey;
-var joinRegExp = utils$3.joinRegExp;
-var urlencode = utils$3.urlencode;
-var uuid4 = utils$3.uuid4;
-var htmlTreeAsString = utils$3.htmlTreeAsString;
-var isSameException = utils$3.isSameException;
-var isSameStacktrace = utils$3.isSameStacktrace;
-var parseUrl = utils$3.parseUrl;
-var fill = utils$3.fill;
-var supportsFetch = utils$3.supportsFetch;
-var supportsReferrerPolicy = utils$3.supportsReferrerPolicy;
-var serializeKeysForMessage = utils$3.serializeKeysForMessage;
-var serializeException = utils$3.serializeException;
+var isError$1 = utils.isError;
+var isObject$1 = utils.isObject;
+var isPlainObject$1 = utils.isPlainObject;
+var isErrorEvent$1 = utils.isErrorEvent;
+var isUndefined$1 = utils.isUndefined;
+var isFunction$1 = utils.isFunction;
+var isString$1 = utils.isString;
+var isArray$1 = utils.isArray;
+var isEmptyObject$1 = utils.isEmptyObject;
+var each$1 = utils.each;
+var objectMerge$1 = utils.objectMerge;
+var truncate$1 = utils.truncate;
+var objectFrozen$1 = utils.objectFrozen;
+var hasKey$1 = utils.hasKey;
+var joinRegExp$1 = utils.joinRegExp;
+var urlencode$1 = utils.urlencode;
+var uuid4$1 = utils.uuid4;
+var htmlTreeAsString$1 = utils.htmlTreeAsString;
+var isSameException$1 = utils.isSameException;
+var isSameStacktrace$1 = utils.isSameStacktrace;
+var parseUrl$1 = utils.parseUrl;
+var fill$1 = utils.fill;
+var supportsFetch$1 = utils.supportsFetch;
+var supportsReferrerPolicy$1 = utils.supportsReferrerPolicy;
+var serializeKeysForMessage$1 = utils.serializeKeysForMessage;
+var serializeException$1 = utils.serializeException;
+var sanitize$1 = utils.sanitize;
 
-var wrapConsoleMethod = require$$0.wrapMethod;
+var wrapConsoleMethod = console$1.wrapMethod;
 
-var dsnKeys = 'source protocol user pass host port path'.split(' ');
-var dsnPattern = /^(?:(\w+):)?\/\/(?:(\w+)(:\w+)?@)?([\w\.-]+)(?::(\d+))?(\/.*)/;
+var dsnKeys = 'source protocol user pass host port path'.split(' '),
+  dsnPattern = /^(?:(\w+):)?\/\/(?:(\w+)(:\w+)?@)?([\w\.-]+)(?::(\d+))?(\/.*)/;
 
 function now() {
   return +new Date();
 }
 
 // This is to be defensive in environments where window does not exist (see https://github.com/getsentry/raven-js/pull/785)
-var _window$1 =
+var _window$2 =
   typeof window !== 'undefined'
     ? window
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
-var _document = _window$1.document;
-var _navigator = _window$1.navigator;
+var _document = _window$2.document;
+var _navigator = _window$2.navigator;
 
 function keepOriginalCallback(original, callback) {
-  return isFunction(callback)
+  return isFunction$1(callback)
     ? function(data) {
         return callback(data, original);
       }
@@ -1766,11 +1702,11 @@ function keepOriginalCallback(original, callback) {
 // First, check for JSON support
 // If there is no JSON, we no-op the core features of Raven
 // since JSON is required to encode the payload
-function Raven$2() {
+function Raven() {
   this._hasJSON = !!(typeof JSON === 'object' && JSON.stringify);
   // Raven can run in contexts where there's no document (react-native)
-  this._hasDocument = !isUndefined(_document);
-  this._hasNavigator = !isUndefined(_navigator);
+  this._hasDocument = !isUndefined$1(_document);
+  this._hasNavigator = !isUndefined$1(_navigator);
   this._lastCapturedException = null;
   this._lastData = null;
   this._lastEventId = null;
@@ -1780,7 +1716,7 @@ function Raven$2() {
   this._globalContext = {};
   this._globalOptions = {
     // SENTRY_RELEASE can be injected by https://github.com/getsentry/sentry-webpack-plugin
-    release: _window$1.SENTRY_RELEASE && _window$1.SENTRY_RELEASE.id,
+    release: _window$2.SENTRY_RELEASE && _window$2.SENTRY_RELEASE.id,
     logger: 'javascript',
     ignoreErrors: [],
     ignoreUrls: [],
@@ -1790,13 +1726,13 @@ function Raven$2() {
     collectWindowErrors: true,
     captureUnhandledRejections: true,
     maxMessageLength: 0,
-
     // By default, truncates URL values to 250 chars
     maxUrlLength: 250,
     stackTraceLimit: 50,
     autoBreadcrumbs: true,
     instrument: true,
-    sampleRate: 1
+    sampleRate: 1,
+    sanitizeKeys: []
   };
   this._fetchDefaults = {
     method: 'POST',
@@ -1805,14 +1741,14 @@ function Raven$2() {
     // https://caniuse.com/#feat=referrer-policy
     // It doesn't. And it throw exception instead of ignoring this parameter...
     // REF: https://github.com/getsentry/raven-js/issues/1233
-    referrerPolicy: supportsReferrerPolicy() ? 'origin' : ''
+    referrerPolicy: supportsReferrerPolicy$1() ? 'origin' : ''
   };
   this._ignoreOnError = 0;
   this._isRavenInstalled = false;
   this._originalErrorStackTraceLimit = Error.stackTraceLimit;
   // capture references to window.console *and* all its methods first
   // before the console plugin has a chance to monkey patch
-  this._originalConsole = _window$1.console || {};
+  this._originalConsole = _window$2.console || {};
   this._originalConsoleMethods = {};
   this._plugins = [];
   this._startTime = now();
@@ -1820,7 +1756,7 @@ function Raven$2() {
   this._breadcrumbs = [];
   this._lastCapturedEvent = null;
   this._keypressTimeout;
-  this._location = _window$1.location;
+  this._location = _window$2.location;
   this._lastHref = this._location && this._location.href;
   this._resetBackoff();
 
@@ -1836,16 +1772,16 @@ function Raven$2() {
  * @this {Raven}
  */
 
-Raven$2.prototype = {
+Raven.prototype = {
   // Hardcode version string so that raven source can be loaded directly via
   // webpack (using a build step causes webpack #1617). Grunt verifies that
   // this value matches package.json during build.
   //   See: https://github.com/getsentry/raven-js/issues/465
-  VERSION: '3.23.3',
+  VERSION: '3.24.0',
 
   debug: false,
 
-  TraceKit: TraceKit$1, // alias to TraceKit
+  TraceKit: tracekit, // alias to TraceKit
 
   /*
      * Configure Raven with a DSN and extra options
@@ -1867,7 +1803,7 @@ Raven$2.prototype = {
 
     // merge in options
     if (options) {
-      each(options, function(key, value) {
+      each$1(options, function(key, value) {
         // tags and extra are special and need to be put into context
         if (key === 'tags' || key === 'extra' || key === 'user') {
           self._globalContext[key] = value;
@@ -1885,14 +1821,14 @@ Raven$2.prototype = {
     globalOptions.ignoreErrors.push(/^Javascript error: Script error\.? on line 0$/);
 
     // join regexp rules into one big rule
-    globalOptions.ignoreErrors = joinRegExp(globalOptions.ignoreErrors);
+    globalOptions.ignoreErrors = joinRegExp$1(globalOptions.ignoreErrors);
     globalOptions.ignoreUrls = globalOptions.ignoreUrls.length
-      ? joinRegExp(globalOptions.ignoreUrls)
+      ? joinRegExp$1(globalOptions.ignoreUrls)
       : false;
     globalOptions.whitelistUrls = globalOptions.whitelistUrls.length
-      ? joinRegExp(globalOptions.whitelistUrls)
+      ? joinRegExp$1(globalOptions.whitelistUrls)
       : false;
-    globalOptions.includePaths = joinRegExp(globalOptions.includePaths);
+    globalOptions.includePaths = joinRegExp$1(globalOptions.includePaths);
     globalOptions.maxBreadcrumbs = Math.max(
       0,
       Math.min(globalOptions.maxBreadcrumbs || 100, 100)
@@ -1908,7 +1844,7 @@ Raven$2.prototype = {
 
     var autoBreadcrumbs = globalOptions.autoBreadcrumbs;
     if ({}.toString.call(autoBreadcrumbs) === '[object Object]') {
-      autoBreadcrumbs = objectMerge(autoBreadcrumbDefaults, autoBreadcrumbs);
+      autoBreadcrumbs = objectMerge$1(autoBreadcrumbDefaults, autoBreadcrumbs);
     } else if (autoBreadcrumbs !== false) {
       autoBreadcrumbs = autoBreadcrumbDefaults;
     }
@@ -1920,13 +1856,13 @@ Raven$2.prototype = {
 
     var instrument = globalOptions.instrument;
     if ({}.toString.call(instrument) === '[object Object]') {
-      instrument = objectMerge(instrumentDefaults, instrument);
+      instrument = objectMerge$1(instrumentDefaults, instrument);
     } else if (instrument !== false) {
       instrument = instrumentDefaults;
     }
     globalOptions.instrument = instrument;
 
-    TraceKit$1.collectWindowErrors = !!globalOptions.collectWindowErrors;
+    tracekit.collectWindowErrors = !!globalOptions.collectWindowErrors;
 
     // return for chaining
     return self;
@@ -1943,7 +1879,7 @@ Raven$2.prototype = {
   install: function() {
     var self = this;
     if (self.isSetup() && !self._isRavenInstalled) {
-      TraceKit$1.report.subscribe(function() {
+      tracekit.report.subscribe(function() {
         self._handleOnErrorStackInfo.apply(self, arguments);
       });
 
@@ -2004,7 +1940,7 @@ Raven$2.prototype = {
      * @param {array} args An array of arguments to be called with the callback [optional]
      */
   context: function(options, func, args) {
-    if (isFunction(options)) {
+    if (isFunction$1(options)) {
       args = func || [];
       func = options;
       options = undefined;
@@ -2025,19 +1961,19 @@ Raven$2.prototype = {
     var self = this;
     // 1 argument has been passed, and it's not a function
     // so just return it
-    if (isUndefined(func) && !isFunction(options)) {
+    if (isUndefined$1(func) && !isFunction$1(options)) {
       return options;
     }
 
     // options is optional
-    if (isFunction(options)) {
+    if (isFunction$1(options)) {
       func = options;
       options = undefined;
     }
 
     // At this point, we've passed along 2 arguments, and the second one
     // is not a function either, so we'll just return the second argument.
-    if (!isFunction(func)) {
+    if (!isFunction$1(func)) {
       return func;
     }
 
@@ -2063,7 +1999,7 @@ Raven$2.prototype = {
         i = arguments.length,
         deep = !options || (options && options.deep !== false);
 
-      if (_before && isFunction(_before)) {
+      if (_before && isFunction$1(_before)) {
         _before.apply(this, arguments);
       }
 
@@ -2086,7 +2022,7 @@ Raven$2.prototype = {
 
     // copy over properties of the old function
     for (var property in func) {
-      if (hasKey(func, property)) {
+      if (hasKey$1(func, property)) {
         wrapped[property] = func[property];
       }
     }
@@ -2107,7 +2043,7 @@ Raven$2.prototype = {
    * @return {Raven}
    */
   uninstall: function() {
-    TraceKit$1.report.uninstall();
+    tracekit.report.uninstall();
 
     this._detachPromiseRejectionHandler();
     this._unpatchFunctionToString();
@@ -2140,8 +2076,8 @@ Raven$2.prototype = {
    */
   _attachPromiseRejectionHandler: function() {
     this._promiseRejectionHandler = this._promiseRejectionHandler.bind(this);
-    _window$1.addEventListener &&
-      _window$1.addEventListener('unhandledrejection', this._promiseRejectionHandler);
+    _window$2.addEventListener &&
+      _window$2.addEventListener('unhandledrejection', this._promiseRejectionHandler);
     return this;
   },
 
@@ -2151,8 +2087,8 @@ Raven$2.prototype = {
    * @return {raven}
    */
   _detachPromiseRejectionHandler: function() {
-    _window$1.removeEventListener &&
-      _window$1.removeEventListener('unhandledrejection', this._promiseRejectionHandler);
+    _window$2.removeEventListener &&
+      _window$2.removeEventListener('unhandledrejection', this._promiseRejectionHandler);
     return this;
   },
 
@@ -2164,15 +2100,15 @@ Raven$2.prototype = {
    * @return {Raven}
    */
   captureException: function(ex, options) {
-    options = objectMerge({trimHeadFrames: 0}, options ? options : {});
+    options = objectMerge$1({trimHeadFrames: 0}, options ? options : {});
 
-    if (isErrorEvent(ex) && ex.error) {
+    if (isErrorEvent$1(ex) && ex.error) {
       // If it is an ErrorEvent with `error` property, extract it to get actual Error
       ex = ex.error;
-    } else if (isError(ex)) {
+    } else if (isError$1(ex)) {
       // we have a real Error object
       ex = ex;
-    } else if (isPlainObject(ex)) {
+    } else if (isPlainObject$1(ex)) {
       // If it is plain Object, serialize it manually and extract options
       // This will allow us to group events based on top-level keys
       // which is much better than creating new group when any key/value change
@@ -2186,7 +2122,7 @@ Raven$2.prototype = {
       // So bail out and capture it as a simple message:
       return this.captureMessage(
         ex,
-        objectMerge(options, {
+        objectMerge$1(options, {
           stacktrace: true, // if we fall back to captureMessage, default to attempting a new trace
           trimHeadFrames: options.trimHeadFrames + 1
         })
@@ -2202,7 +2138,7 @@ Raven$2.prototype = {
     // raises an exception different from the one we asked to
     // report on.
     try {
-      var stack = TraceKit$1.computeStackTrace(ex);
+      var stack = tracekit.computeStackTrace(ex);
       this._handleStackInfo(stack, options);
     } catch (ex1) {
       if (ex !== ex1) {
@@ -2215,13 +2151,13 @@ Raven$2.prototype = {
 
   _getCaptureExceptionOptionsFromPlainObject: function(currentOptions, ex) {
     var exKeys = Object.keys(ex).sort();
-    var options = objectMerge(currentOptions, {
+    var options = objectMerge$1(currentOptions, {
       message:
-        'Non-Error exception captured with keys: ' + serializeKeysForMessage(exKeys),
-      fingerprint: [md5$2(exKeys)],
+        'Non-Error exception captured with keys: ' + serializeKeysForMessage$1(exKeys),
+      fingerprint: [md5_1(exKeys)],
       extra: currentOptions.extra || {}
     });
-    options.extra.__serialized__ = serializeException(ex);
+    options.extra.__serialized__ = serializeException$1(ex);
 
     return options;
   },
@@ -2247,7 +2183,7 @@ Raven$2.prototype = {
     options = options || {};
     msg = msg + ''; // Make sure it's actually a string
 
-    var data = objectMerge(
+    var data = objectMerge$1(
       {
         message: msg
       },
@@ -2267,10 +2203,10 @@ Raven$2.prototype = {
 
     // null exception name so `Error` isn't prefixed to msg
     ex.name = null;
-    var stack = TraceKit$1.computeStackTrace(ex);
+    var stack = tracekit.computeStackTrace(ex);
 
     // stack[0] is `throw new Error(msg)` call itself, we are interested in the frame that was just before that, stack[1]
-    var initialCall = isArray(stack.stack) && stack.stack[1];
+    var initialCall = isArray$1(stack.stack) && stack.stack[1];
     var fileurl = (initialCall && initialCall.url) || '';
 
     if (
@@ -2291,7 +2227,7 @@ Raven$2.prototype = {
       // fingerprint on msg, not stack trace (legacy behavior, could be revisited)
       data.fingerprint = data.fingerprint == null ? msg : data.fingerprint;
 
-      options = objectMerge(
+      options = objectMerge$1(
         {
           trimHeadFrames: 0
         },
@@ -2312,7 +2248,7 @@ Raven$2.prototype = {
 
     // Make sure that fingerprint is always wrapped in an array
     if (data.fingerprint) {
-      data.fingerprint = isArray(data.fingerprint)
+      data.fingerprint = isArray$1(data.fingerprint)
         ? data.fingerprint
         : [data.fingerprint];
     }
@@ -2324,17 +2260,17 @@ Raven$2.prototype = {
   },
 
   captureBreadcrumb: function(obj) {
-    var crumb = objectMerge(
+    var crumb = objectMerge$1(
       {
         timestamp: now() / 1000
       },
       obj
     );
 
-    if (isFunction(this._globalOptions.breadcrumbCallback)) {
+    if (isFunction$1(this._globalOptions.breadcrumbCallback)) {
       var result = this._globalOptions.breadcrumbCallback(crumb);
 
-      if (isObject(result) && !isEmptyObject(result)) {
+      if (isObject$1(result) && !isEmptyObject$1(result)) {
         crumb = result;
       } else if (result === false) {
         return this;
@@ -2414,7 +2350,7 @@ Raven$2.prototype = {
      */
   getContext: function() {
     // lol javascript
-    return JSON.parse(stringify$1(this._globalContext));
+    return JSON.parse(stringify_1(this._globalContext));
   },
 
   /*
@@ -2534,7 +2470,7 @@ Raven$2.prototype = {
     // TODO: remove window dependence?
 
     // Attempt to initialize Raven on load
-    var RavenConfig = _window$1.RavenConfig;
+    var RavenConfig = _window$2.RavenConfig;
     if (RavenConfig) {
       this.config(RavenConfig.dsn, RavenConfig.config).install();
     }
@@ -2550,12 +2486,12 @@ Raven$2.prototype = {
 
     var lastEventId = options.eventId || this.lastEventId();
     if (!lastEventId) {
-      throw new RavenConfigError$1('Missing eventId');
+      throw new configError('Missing eventId');
     }
 
     var dsn = options.dsn || this._dsn;
     if (!dsn) {
-      throw new RavenConfigError$1('Missing DSN');
+      throw new configError('Missing DSN');
     }
 
     var encode = encodeURIComponent;
@@ -2606,7 +2542,7 @@ Raven$2.prototype = {
     }
 
     for (key in options)
-      if (hasKey(options, key)) {
+      if (hasKey$1(options, key)) {
         evt[key] = options[key];
       }
 
@@ -2651,7 +2587,7 @@ Raven$2.prototype = {
       //   can throw an exception in some circumstances.
       var target;
       try {
-        target = htmlTreeAsString(evt.target);
+        target = htmlTreeAsString$1(evt.target);
       } catch (e) {
         target = '<unknown>';
       }
@@ -2715,9 +2651,9 @@ Raven$2.prototype = {
    * @private
    */
   _captureUrlChange: function(from, to) {
-    var parsedLoc = parseUrl(this._location.href);
-    var parsedTo = parseUrl(to);
-    var parsedFrom = parseUrl(from);
+    var parsedLoc = parseUrl$1(this._location.href);
+    var parsedTo = parseUrl$1(to);
+    var parsedFrom = parseUrl$1(from);
 
     // because onpopstate only tells you the "new" (to) value of location.href, and
     // not the previous (from) value, we need to track the value of the current URL
@@ -2778,7 +2714,7 @@ Raven$2.prototype = {
           args[i] = arguments[i];
         }
         var originalCallback = args[0];
-        if (isFunction(originalCallback)) {
+        if (isFunction$1(originalCallback)) {
           args[0] = self.wrap(originalCallback);
         }
 
@@ -2796,9 +2732,9 @@ Raven$2.prototype = {
     var autoBreadcrumbs = this._globalOptions.autoBreadcrumbs;
 
     function wrapEventTarget(global) {
-      var proto = _window$1[global] && _window$1[global].prototype;
+      var proto = _window$2[global] && _window$2[global].prototype;
       if (proto && proto.hasOwnProperty && proto.hasOwnProperty('addEventListener')) {
-        fill(
+        fill$1(
           proto,
           'addEventListener',
           function(orig) {
@@ -2854,7 +2790,7 @@ Raven$2.prototype = {
           },
           wrappedBuiltIns
         );
-        fill(
+        fill$1(
           proto,
           'removeEventListener',
           function(orig) {
@@ -2872,11 +2808,11 @@ Raven$2.prototype = {
       }
     }
 
-    fill(_window$1, 'setTimeout', wrapTimeFn, wrappedBuiltIns);
-    fill(_window$1, 'setInterval', wrapTimeFn, wrappedBuiltIns);
-    if (_window$1.requestAnimationFrame) {
-      fill(
-        _window$1,
+    fill$1(_window$2, 'setTimeout', wrapTimeFn, wrappedBuiltIns);
+    fill$1(_window$2, 'setInterval', wrapTimeFn, wrappedBuiltIns);
+    if (_window$2.requestAnimationFrame) {
+      fill$1(
+        _window$2,
         'requestAnimationFrame',
         function(orig) {
           return function(cb) {
@@ -2941,16 +2877,16 @@ Raven$2.prototype = {
     var wrappedBuiltIns = self._wrappedBuiltIns;
 
     function wrapProp(prop, xhr) {
-      if (prop in xhr && isFunction(xhr[prop])) {
-        fill(xhr, prop, function(orig) {
+      if (prop in xhr && isFunction$1(xhr[prop])) {
+        fill$1(xhr, prop, function(orig) {
           return self.wrap(orig);
         }); // intentionally don't track filled methods on XHR instances
       }
     }
 
-    if (autoBreadcrumbs.xhr && 'XMLHttpRequest' in _window$1) {
-      var xhrproto = XMLHttpRequest.prototype;
-      fill(
+    if (autoBreadcrumbs.xhr && 'XMLHttpRequest' in _window$2) {
+      var xhrproto = _window$2.XMLHttpRequest && _window$2.XMLHttpRequest.prototype;
+      fill$1(
         xhrproto,
         'open',
         function(origOpen) {
@@ -2958,7 +2894,7 @@ Raven$2.prototype = {
             // preserve arity
 
             // if Sentry key appears in URL, don't capture
-            if (isString(url) && url.indexOf(self._globalKey) === -1) {
+            if (isString$1(url) && url.indexOf(self._globalKey) === -1) {
               this.__raven_xhr = {
                 method: method,
                 url: url,
@@ -2972,7 +2908,7 @@ Raven$2.prototype = {
         wrappedBuiltIns
       );
 
-      fill(
+      fill$1(
         xhrproto,
         'send',
         function(origSend) {
@@ -3003,8 +2939,8 @@ Raven$2.prototype = {
               wrapProp(props[j], xhr);
             }
 
-            if ('onreadystatechange' in xhr && isFunction(xhr.onreadystatechange)) {
-              fill(
+            if ('onreadystatechange' in xhr && isFunction$1(xhr.onreadystatechange)) {
+              fill$1(
                 xhr,
                 'onreadystatechange',
                 function(orig) {
@@ -3024,9 +2960,9 @@ Raven$2.prototype = {
       );
     }
 
-    if (autoBreadcrumbs.xhr && supportsFetch()) {
-      fill(
-        _window$1,
+    if (autoBreadcrumbs.xhr && supportsFetch$1()) {
+      fill$1(
+        _window$2,
         'fetch',
         function(origFetch) {
           return function() {
@@ -3044,7 +2980,7 @@ Raven$2.prototype = {
 
             if (typeof fetchInput === 'string') {
               url = fetchInput;
-            } else if ('Request' in _window$1 && fetchInput instanceof _window$1.Request) {
+            } else if ('Request' in _window$2 && fetchInput instanceof _window$2.Request) {
               url = fetchInput.url;
               if (fetchInput.method) {
                 method = fetchInput.method;
@@ -3102,17 +3038,17 @@ Raven$2.prototype = {
     // NOTE: in Chrome App environment, touching history.pushState, *even inside
     //       a try/catch block*, will cause Chrome to output an error to console.error
     // borrowed from: https://github.com/angular/angular.js/pull/13945/files
-    var chrome = _window$1.chrome;
+    var chrome = _window$2.chrome;
     var isChromePackagedApp = chrome && chrome.app && chrome.app.runtime;
     var hasPushAndReplaceState =
       !isChromePackagedApp &&
-      _window$1.history &&
+      _window$2.history &&
       history.pushState &&
       history.replaceState;
     if (autoBreadcrumbs.location && hasPushAndReplaceState) {
       // TODO: remove onpopstate handler on uninstall()
-      var oldOnPopState = _window$1.onpopstate;
-      _window$1.onpopstate = function() {
+      var oldOnPopState = _window$2.onpopstate;
+      _window$2.onpopstate = function() {
         var currentHref = self._location.href;
         self._captureUrlChange(self._lastHref, currentHref);
 
@@ -3137,11 +3073,11 @@ Raven$2.prototype = {
         };
       };
 
-      fill(history, 'pushState', historyReplacementFunction, wrappedBuiltIns);
-      fill(history, 'replaceState', historyReplacementFunction, wrappedBuiltIns);
+      fill$1(history, 'pushState', historyReplacementFunction, wrappedBuiltIns);
+      fill$1(history, 'replaceState', historyReplacementFunction, wrappedBuiltIns);
     }
 
-    if (autoBreadcrumbs.console && 'console' in _window$1 && console.log) {
+    if (autoBreadcrumbs.console && 'console' in _window$2 && console.log) {
       // console
       var consoleMethodCallback = function(msg, data) {
         self.captureBreadcrumb({
@@ -3151,7 +3087,7 @@ Raven$2.prototype = {
         });
       };
 
-      each(['debug', 'info', 'warn', 'error', 'log'], function(_, level) {
+      each$1(['debug', 'info', 'warn', 'error', 'log'], function(_, level) {
         wrapConsoleMethod(console, level, consoleMethodCallback);
       });
     }
@@ -3182,7 +3118,7 @@ Raven$2.prototype = {
     var self = this;
 
     // FIX ME TODO
-    each(this._plugins, function(_, plugin) {
+    each$1(this._plugins, function(_, plugin) {
       var installer = plugin[0];
       var args = plugin[1];
       installer.apply(self, [self].concat(args));
@@ -3197,11 +3133,11 @@ Raven$2.prototype = {
     try {
       while (i--) dsn[dsnKeys[i]] = m[i] || '';
     } catch (e) {
-      throw new RavenConfigError$1('Invalid DSN: ' + str);
+      throw new configError('Invalid DSN: ' + str);
     }
 
     if (dsn.pass && !this._globalOptions.allowSecretKey) {
-      throw new RavenConfigError$1(
+      throw new configError(
         'Do not specify your secret key in the DSN. See: http://bit.ly/raven-secret-key'
       );
     }
@@ -3248,7 +3184,7 @@ Raven$2.prototype = {
     var self = this;
     var frames = [];
     if (stackInfo.stack && stackInfo.stack.length) {
-      each(stackInfo.stack, function(i, stack) {
+      each$1(stackInfo.stack, function(i, stack) {
         var frame = self._normalizeFrame(stack, stackInfo.url);
         if (frame) {
           frames.push(frame);
@@ -3342,7 +3278,7 @@ Raven$2.prototype = {
       return;
     }
 
-    var data = objectMerge(
+    var data = objectMerge$1(
       {
         // sentry.interfaces.Exception
         exception: {
@@ -3368,20 +3304,20 @@ Raven$2.prototype = {
     // but this could/should be expanded to just trim everything
     var max = this._globalOptions.maxMessageLength;
     if (data.message) {
-      data.message = truncate(data.message, max);
+      data.message = truncate$1(data.message, max);
     }
     if (data.exception) {
       var exception = data.exception.values[0];
-      exception.value = truncate(exception.value, max);
+      exception.value = truncate$1(exception.value, max);
     }
 
     var request = data.request;
     if (request) {
       if (request.url) {
-        request.url = truncate(request.url, this._globalOptions.maxUrlLength);
+        request.url = truncate$1(request.url, this._globalOptions.maxUrlLength);
       }
       if (request.Referer) {
-        request.Referer = truncate(request.Referer, this._globalOptions.maxUrlLength);
+        request.Referer = truncate$1(request.Referer, this._globalOptions.maxUrlLength);
       }
     }
 
@@ -3406,16 +3342,16 @@ Raven$2.prototype = {
       crumb = breadcrumbs.values[i];
       if (
         !crumb.hasOwnProperty('data') ||
-        !isObject(crumb.data) ||
-        objectFrozen(crumb.data)
+        !isObject$1(crumb.data) ||
+        objectFrozen$1(crumb.data)
       )
         continue;
 
-      data = objectMerge({}, crumb.data);
+      data = objectMerge$1({}, crumb.data);
       for (var j = 0; j < urlProps.length; ++j) {
         urlProp = urlProps[j];
         if (data.hasOwnProperty(urlProp) && data[urlProp]) {
-          data[urlProp] = truncate(data[urlProp], this._globalOptions.maxUrlLength);
+          data[urlProp] = truncate$1(data[urlProp], this._globalOptions.maxUrlLength);
         }
       }
       breadcrumbs.values[i].data = data;
@@ -3433,8 +3369,8 @@ Raven$2.prototype = {
     }
 
     // Check in `window` instead of `document`, as we may be in ServiceWorker environment
-    if (_window$1.location && _window$1.location.href) {
-      httpData.url = _window$1.location.href;
+    if (_window$2.location && _window$2.location.href) {
+      httpData.url = _window$2.location.href;
     }
 
     if (this._hasDocument && _document.referrer) {
@@ -3475,10 +3411,10 @@ Raven$2.prototype = {
 
     // Stacktrace interface (i.e. from captureMessage)
     if (current.stacktrace || last.stacktrace) {
-      return isSameStacktrace(current.stacktrace, last.stacktrace);
+      return isSameStacktrace$1(current.stacktrace, last.stacktrace);
     } else if (current.exception || last.exception) {
       // Exception interface (i.e. from captureException/onerror)
-      return isSameException(current.exception, last.exception);
+      return isSameException$1(current.exception, last.exception);
     }
 
     return true;
@@ -3501,7 +3437,7 @@ Raven$2.prototype = {
     try {
       // If Retry-After is not in Access-Control-Expose-Headers, most
       // browsers will throw an exception trying to access it
-      if (supportsFetch()) {
+      if (supportsFetch$1()) {
         retry = request.headers.get('Retry-After');
       } else {
         retry = request.getResponseHeader('Retry-After');
@@ -3539,11 +3475,11 @@ Raven$2.prototype = {
     // HACK: delete `trimHeadFrames` to prevent from appearing in outbound payload
     if (data.trimHeadFrames) delete data.trimHeadFrames;
 
-    data = objectMerge(baseData, data);
+    data = objectMerge$1(baseData, data);
 
     // Merge in the tags and extra separately since objectMerge doesn't handle a deep merge
-    data.tags = objectMerge(objectMerge({}, this._globalContext.tags), data.tags);
-    data.extra = objectMerge(objectMerge({}, this._globalContext.extra), data.extra);
+    data.tags = objectMerge$1(objectMerge$1({}, this._globalContext.tags), data.tags);
+    data.extra = objectMerge$1(objectMerge$1({}, this._globalContext.extra), data.extra);
 
     // Send along our own collected metadata with extra
     data.extra['session:duration'] = now() - this._startTime;
@@ -3570,25 +3506,27 @@ Raven$2.prototype = {
     // Include server_name if it's defined in globalOptions
     if (globalOptions.serverName) data.server_name = globalOptions.serverName;
 
+    data = this._sanitizeData(data);
+
     // Cleanup empty properties before sending them to the server
     Object.keys(data).forEach(function(key) {
-      if (data[key] == null || data[key] === '' || isEmptyObject(data[key])) {
+      if (data[key] == null || data[key] === '' || isEmptyObject$1(data[key])) {
         delete data[key];
       }
     });
 
-    if (isFunction(globalOptions.dataCallback)) {
+    if (isFunction$1(globalOptions.dataCallback)) {
       data = globalOptions.dataCallback(data) || data;
     }
 
     // Why??????????
-    if (!data || isEmptyObject(data)) {
+    if (!data || isEmptyObject$1(data)) {
       return;
     }
 
     // Check if the request should be filtered or not
     if (
-      isFunction(globalOptions.shouldSendCallback) &&
+      isFunction$1(globalOptions.shouldSendCallback) &&
       !globalOptions.shouldSendCallback(data)
     ) {
       return;
@@ -3610,8 +3548,12 @@ Raven$2.prototype = {
     }
   },
 
+  _sanitizeData: function(data) {
+    return sanitize$1(data, this._globalOptions.sanitizeKeys);
+  },
+
   _getUuid: function() {
-    return uuid4();
+    return uuid4$1();
   },
 
   _sendProcessedPayload: function(data, callback) {
@@ -3702,7 +3644,7 @@ Raven$2.prototype = {
 
   _makeRequest: function(opts) {
     // Auth is intentionally sent as part of query string (NOT as custom HTTP header) to avoid preflight CORS requests
-    var url = opts.url + '?' + urlencode(opts.auth);
+    var url = opts.url + '?' + urlencode$1(opts.auth);
 
     var evaluatedHeaders = null;
     var evaluatedFetchParameters = {};
@@ -3715,17 +3657,17 @@ Raven$2.prototype = {
       evaluatedFetchParameters = this._evaluateHash(opts.options.fetchParameters);
     }
 
-    if (supportsFetch()) {
-      evaluatedFetchParameters.body = stringify$1(opts.data);
+    if (supportsFetch$1()) {
+      evaluatedFetchParameters.body = stringify_1(opts.data);
 
-      var defaultFetchOptions = objectMerge({}, this._fetchDefaults);
-      var fetchOptions = objectMerge(defaultFetchOptions, evaluatedFetchParameters);
+      var defaultFetchOptions = objectMerge$1({}, this._fetchDefaults);
+      var fetchOptions = objectMerge$1(defaultFetchOptions, evaluatedFetchParameters);
 
       if (evaluatedHeaders) {
         fetchOptions.headers = evaluatedHeaders;
       }
 
-      return _window$1
+      return _window$2
         .fetch(url, fetchOptions)
         .then(function(response) {
           if (response.ok) {
@@ -3744,7 +3686,7 @@ Raven$2.prototype = {
         });
     }
 
-    var request = _window$1.XMLHttpRequest && new _window$1.XMLHttpRequest();
+    var request = _window$2.XMLHttpRequest && new _window$2.XMLHttpRequest();
     if (!request) return;
 
     // if browser doesn't support CORS (e.g. IE7), we are out of luck
@@ -3786,12 +3728,12 @@ Raven$2.prototype = {
     request.open('POST', url);
 
     if (evaluatedHeaders) {
-      each(evaluatedHeaders, function(key, value) {
+      each$1(evaluatedHeaders, function(key, value) {
         request.setRequestHeader(key, value);
       });
     }
 
-    request.send(stringify$1(opts.data));
+    request.send(stringify_1(opts.data));
   },
 
   _evaluateHash: function(hash) {
@@ -3819,36 +3761,36 @@ Raven$2.prototype = {
   },
 
   _mergeContext: function(key, context) {
-    if (isUndefined(context)) {
+    if (isUndefined$1(context)) {
       delete this._globalContext[key];
     } else {
-      this._globalContext[key] = objectMerge(this._globalContext[key] || {}, context);
+      this._globalContext[key] = objectMerge$1(this._globalContext[key] || {}, context);
     }
   }
 };
 
 // Deprecations
-Raven$2.prototype.setUser = Raven$2.prototype.setUserContext;
-Raven$2.prototype.setReleaseContext = Raven$2.prototype.setRelease;
+Raven.prototype.setUser = Raven.prototype.setUserContext;
+Raven.prototype.setReleaseContext = Raven.prototype.setRelease;
 
-var raven = Raven$2;
+var raven = Raven;
+
+/**
+ * Enforces a single instance of the Raven client, and the
+ * main entry point for Raven. If you are a consumer of the
+ * Raven library, you SHOULD load this file (vs raven.js).
+ **/
 
 
 
-var raven$2 = Object.freeze({
-	default: raven,
-	__moduleExports: raven
-});
-
-var RavenConstructor = ( raven$2 && raven ) || raven$2;
-
-var _window =
+// This is to be defensive in environments where window does not exist (see https://github.com/getsentry/raven-js/pull/785)
+var _window$3 =
   typeof window !== 'undefined'
     ? window
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
-var _Raven = _window.Raven;
+var _Raven = _window$3.Raven;
 
-var Raven = new RavenConstructor();
+var Raven$1 = new raven();
 
 /*
  * Allow multiple versions of Raven to be installed.
@@ -3856,19 +3798,52 @@ var Raven = new RavenConstructor();
  *
  * @return {Raven}
  */
-Raven.noConflict = function() {
-  _window.Raven = _Raven;
-  return Raven;
+Raven$1.noConflict = function() {
+  _window$3.Raven = _Raven;
+  return Raven$1;
 };
 
-Raven.afterLoad();
+Raven$1.afterLoad();
 
-var singleton = Raven;
+var singleton = Raven$1;
 
-// ==========================================================================
-// Plyr.io demo
-// This code is purely for the https://plyr.io website
-// Please see readme.md in the root or github.com/sampotts/plyr
+/**
+ * DISCLAIMER:
+ *
+ * Expose `Client` constructor for cases where user want to track multiple "sub-applications" in one larger app.
+ * It's not meant to be used by a wide audience, so pleaaase make sure that you know what you're doing before using it.
+ * Accidentally calling `install` multiple times, may result in an unexpected behavior that's very hard to debug.
+ *
+ * It's called `Client' to be in-line with Raven Node implementation.
+ *
+ * HOWTO:
+ *
+ * import Raven from 'raven-js';
+ *
+ * const someAppReporter = new Raven.Client();
+ * const someOtherAppReporter = new Raven.Client();
+ *
+ * someAppReporter('__DSN__', {
+ *   ...config goes here
+ * });
+ *
+ * someOtherAppReporter('__OTHER_DSN__', {
+ *   ...config goes here
+ * });
+ *
+ * someAppReporter.captureMessage(...);
+ * someAppReporter.captureException(...);
+ * someAppReporter.captureBreadcrumb(...);
+ *
+ * someOtherAppReporter.captureMessage(...);
+ * someOtherAppReporter.captureException(...);
+ * someOtherAppReporter.captureBreadcrumb(...);
+ *
+ * It should "just work".
+ */
+var Client = raven;
+singleton.Client = Client;
+
 // ==========================================================================
 
 (function () {
