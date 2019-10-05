@@ -18,6 +18,10 @@ const defaults = {
     // Only allow one media playing at once (vimeo only)
     autopause: true,
 
+    // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
+    // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+    playsinline: true,
+
     // Default time to skip when rewind/fast forward
     seekTime: 10,
 
@@ -38,8 +42,9 @@ const defaults = {
     // Clicking the currentTime inverts it's value to show time left rather than elapsed
     toggleInvert: true,
 
-    // Aspect ratio (for embeds)
-    ratio: '16:9',
+    // Force an aspect ratio
+    // The format must be `'w:h'` (e.g. `'16:9'`)
+    ratio: null,
 
     // Click video container to play/pause
     clickToPlay: true,
@@ -47,8 +52,8 @@ const defaults = {
     // Auto hide the controls
     hideControls: true,
 
-    // Revert to poster on finish (HTML5 - will cause reload)
-    showPosterOnEnd: false,
+    // Reset to start when playback ended
+    resetOnEnd: false,
 
     // Disable the standard context menu
     disableContextMenu: true,
@@ -56,25 +61,15 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.3/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.5.6/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 
     // Quality default
     quality: {
-        default: 'default',
-        options: [
-            'hd2160',
-            'hd1440',
-            'hd1080',
-            'hd720',
-            'large',
-            'medium',
-            'small',
-            'tiny',
-            'default',
-        ],
+        default: 576,
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     },
 
     // Set loops
@@ -87,15 +82,7 @@ const defaults = {
     // Speed default and options to display
     speed: {
         selected: 1,
-        options: [
-            0.5,
-            0.75,
-            1,
-            1.25,
-            1.5,
-            1.75,
-            2,
-        ],
+        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     },
 
     // Keyboard shortcut settings
@@ -113,13 +100,16 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: window.navigator.language.split('-')[0],
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false,
     },
 
     // Fullscreen settings
     fullscreen: {
         enabled: true, // Allow fullscreen?
-        fallback: true, // Fallback for vintage browsers
+        fallback: true, // Fallback using full viewport/window
         iosNative: false, // Use the native fullscreen in iOS (disables custom controls)
     },
 
@@ -138,28 +128,27 @@ const defaults = {
         // 'fast-forward',
         'progress',
         'current-time',
+        // 'duration',
         'mute',
         'volume',
         'captions',
         'settings',
         'pip',
         'airplay',
+        // 'download',
         'fullscreen',
     ],
-    settings: [
-        'captions',
-        'quality',
-        'speed',
-    ],
+    settings: ['captions', 'quality', 'speed'],
 
     // Localisation
     i18n: {
         restart: 'Restart',
-        rewind: 'Rewind {seektime} secs',
+        rewind: 'Rewind {seektime}s',
         play: 'Play',
         pause: 'Pause',
-        fastForward: 'Forward {seektime} secs',
+        fastForward: 'Forward {seektime}s',
         seek: 'Seek',
+        seekLabel: '{currentTime} of {duration}',
         played: 'Played',
         buffered: 'Buffered',
         currentTime: 'Current time',
@@ -169,33 +158,48 @@ const defaults = {
         unmute: 'Unmute',
         enableCaptions: 'Enable captions',
         disableCaptions: 'Disable captions',
+        download: 'Download',
         enterFullscreen: 'Enter fullscreen',
         exitFullscreen: 'Exit fullscreen',
         frameTitle: 'Player for {title}',
         captions: 'Captions',
         settings: 'Settings',
+        menuBack: 'Go back to previous menu',
         speed: 'Speed',
+        normal: 'Normal',
         quality: 'Quality',
         loop: 'Loop',
         start: 'Start',
         end: 'End',
         all: 'All',
         reset: 'Reset',
-        none: 'None',
         disabled: 'Disabled',
+        enabled: 'Enabled',
         advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD',
+        },
     },
 
     // URLs
     urls: {
+        download: null,
         vimeo: {
-            api: 'https://player.vimeo.com/api/player.js',
+            sdk: 'https://player.vimeo.com/api/player.js',
+            iframe: 'https://player.vimeo.com/video/{0}?{1}',
+            api: 'https://vimeo.com/api/v2/video/{0}.json',
         },
         youtube: {
-            api: 'https://www.youtube.com/iframe_api',
+            sdk: 'https://www.youtube.com/iframe_api',
+            api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}',
         },
         googleIMA: {
-            api: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
+            sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
         },
     },
 
@@ -210,6 +214,7 @@ const defaults = {
         mute: null,
         volume: null,
         captions: null,
+        download: null,
         fullscreen: null,
         pip: null,
         airplay: null,
@@ -245,6 +250,7 @@ const defaults = {
         'cuechange',
 
         // Custom events
+        'download',
         'enterfullscreen',
         'exitfullscreen',
         'captionsenabled',
@@ -256,8 +262,9 @@ const defaults = {
 
         // YouTube
         'statechange',
+
+        // Quality
         'qualitychange',
-        'qualityrequested',
 
         // Ads
         'adsloaded',
@@ -289,6 +296,7 @@ const defaults = {
             fastForward: '[data-plyr="fast-forward"]',
             mute: '[data-plyr="mute"]',
             captions: '[data-plyr="captions"]',
+            download: '[data-plyr="download"]',
             fullscreen: '[data-plyr="fullscreen"]',
             pip: '[data-plyr="pip"]',
             airplay: '[data-plyr="airplay"]',
@@ -305,30 +313,32 @@ const defaults = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display',
         },
         progress: '.plyr__progress',
         captions: '.plyr__captions',
-        menu: {
-            quality: '.js-plyr__menu__list--quality',
-        },
+        caption: '.plyr__caption',
     },
 
     // Class hooks added to the player in different states
     classNames: {
-        video: 'plyr__video-wrapper',
-        embed: 'plyr__video-embed',
-        ads: 'plyr__ads',
-        control: 'plyr__control',
         type: 'plyr--{0}',
         provider: 'plyr--{0}',
-        stopped: 'plyr--stopped',
+        video: 'plyr__video-wrapper',
+        embed: 'plyr__video-embed',
+        videoFixedRatio: 'plyr__video-wrapper--fixed-ratio',
+        embedContainer: 'plyr__video-embed__container',
+        poster: 'plyr__poster',
+        posterEnabled: 'plyr__poster-enabled',
+        ads: 'plyr__ads',
+        control: 'plyr__control',
+        controlPressed: 'plyr__control--pressed',
         playing: 'plyr--playing',
+        paused: 'plyr--paused',
+        stopped: 'plyr--stopped',
         loading: 'plyr--loading',
-        error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
         cues: 'plyr__cues',
@@ -338,6 +348,9 @@ const defaults = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        display: {
+            time: 'plyr__time',
+        },
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',
@@ -360,6 +373,16 @@ const defaults = {
             active: 'plyr--airplay-active',
         },
         tabFocus: 'plyr__tab-focus',
+        previewThumbnails: {
+            // Tooltip thumbs
+            thumbContainer: 'plyr__preview-thumb',
+            thumbContainerShown: 'plyr__preview-thumb--is-shown',
+            imageContainer: 'plyr__preview-thumb__image-container',
+            timeContainer: 'plyr__preview-thumb__time-container',
+            // Scrubbing
+            scrubbingContainer: 'plyr__preview-scrubbing',
+            scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
+        },
     },
 
     // Embed attributes
@@ -370,16 +393,36 @@ const defaults = {
         },
     },
 
-    // API keys
-    keys: {
-        google: null,
-    },
-
     // Advertisements plugin
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
         enabled: false,
         publisherId: '',
+        tagUrl: '',
+    },
+
+    // Preview Thumbnails plugin
+    previewThumbnails: {
+        enabled: false,
+        src: '',
+    },
+
+    // Vimeo plugin
+    vimeo: {
+        byline: false,
+        portrait: false,
+        title: false,
+        speed: true,
+        transparent: false,
+    },
+
+    // YouTube plugin
+    youtube: {
+        noCookie: false, // Whether to use an alternative version of YouTube without cookies
+        rel: 0, // No related vids
+        showinfo: 0, // Hide info
+        iv_load_policy: 3, // Hide annotations
+        modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
     },
 };
 
